@@ -1,0 +1,110 @@
+<% pageTitle = 'Hisobotlar' %>
+<%- include('partials/head') %>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h2>Eng ko'p sotilgan mahsulotlar</h2></div>
+    <div class="card-body no-pad">
+      <% if (topProducts.length === 0) { %>
+        <div class="empty">Ma'lumot yo'q.</div>
+      <% } else { %>
+        <table class="table">
+          <thead><tr><th>Mahsulot</th><th>Sotildi</th><th>Daromad</th></tr></thead>
+          <tbody>
+            <% topProducts.forEach(p => { %>
+              <tr>
+                <td class="strong"><%= p.name %></td>
+                <td><%= p.sold %> dona</td>
+                <td><%= Number(p.revenue).toLocaleString('uz-UZ') %> so'm</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Eng faol mijozlar</h2></div>
+    <div class="card-body no-pad">
+      <% if (topCustomers.length === 0) { %>
+        <div class="empty">Ma'lumot yo'q.</div>
+      <% } else { %>
+        <table class="table">
+          <thead><tr><th>Mijoz</th><th>Buyurtmalar</th><th>Jami xarid</th></tr></thead>
+          <tbody>
+            <% topCustomers.forEach(c => { %>
+              <tr>
+                <td class="strong"><%= c.name %></td>
+                <td><%= c.order_count %></td>
+                <td><%= Number(c.total_spent).toLocaleString('uz-UZ') %> so'm</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h2>Kategoriya bo'yicha savdo</h2></div>
+    <div class="card-body">
+      <% if (salesByCategory.length === 0) { %>
+        <div class="empty">Ma'lumot yo'q.</div>
+      <% } else { %>
+        <canvas id="catChart" height="140"></canvas>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Kam qolgan mahsulotlar</h2></div>
+    <div class="card-body no-pad">
+      <% if (lowStock.length === 0) { %>
+        <div class="empty">Hamma mahsulot yetarli miqdorda. ✓</div>
+      <% } else { %>
+        <table class="table">
+          <thead><tr><th>Mahsulot</th><th>O'lcham</th><th>Rang</th><th>Qoldiq</th></tr></thead>
+          <tbody>
+            <% lowStock.forEach(p => { %>
+              <tr>
+                <td class="strong"><%= p.name %></td>
+                <td><%= p.size || '—' %></td>
+                <td><%= p.color || '—' %></td>
+                <td><span class="badge badge-bekor"><%= p.stock %> dona</span></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% if (salesByCategory.length > 0) { %>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  const catLabels = <%- JSON.stringify(salesByCategory.map(r => r.category)) %>;
+  const catData = <%- JSON.stringify(salesByCategory.map(r => Number(r.revenue))) %>;
+  new Chart(document.getElementById('catChart'), {
+    type: 'doughnut',
+    data: {
+      labels: catLabels,
+      datasets: [{
+        data: catData,
+        backgroundColor: ['#4f46e5','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: { size: 12 } } } },
+      cutout: '62%'
+    }
+  });
+</script>
+<% } %>
+
+<%- include('partials/foot') %>

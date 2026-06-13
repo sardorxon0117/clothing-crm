@@ -1,0 +1,47 @@
+<% pageTitle = formTitle %>
+<%- include('partials/head') %>
+
+<div class="form-wrap">
+  <div class="card">
+    <div class="card-head"><h2><%= formTitle %></h2></div>
+    <div class="card-body">
+      <% const action = customer ? '/customers/' + customer.id + '?_method=PUT' : '/customers' %>
+      <form action="<%= action %>" method="POST" class="form">
+        <div class="form-row">
+          <label class="field">
+            <span>Ism familiya <em>*</em></span>
+            <input type="text" name="name" value="<%= customer ? customer.name : '' %>" required>
+          </label>
+          <label class="field">
+            <span>Mijoz turi</span>
+            <select name="customer_type">
+              <% ['oddiy','doimiy','VIP'].forEach(t => { %>
+                <option value="<%= t %>" <%= customer && customer.customer_type === t ? 'selected' : '' %>><%= t %></option>
+              <% }) %>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label class="field">
+            <span>Telefon</span>
+            <input type="text" name="phone" value="<%= customer ? (customer.phone || '') : '' %>" placeholder="+998 90 123 45 67">
+          </label>
+          <label class="field">
+            <span>Email</span>
+            <input type="email" name="email" value="<%= customer ? (customer.email || '') : '' %>" placeholder="mijoz@mail.uz">
+          </label>
+        </div>
+        <label class="field">
+          <span>Manzil</span>
+          <textarea name="address" rows="2" placeholder="Shahar, ko'cha, uy..."><%= customer ? (customer.address || '') : '' %></textarea>
+        </label>
+        <div class="form-actions">
+          <a href="/customers" class="btn btn-ghost">Bekor qilish</a>
+          <button type="submit" class="btn btn-primary"><%= customer ? 'Saqlash' : 'Qo\u2019shish' %></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

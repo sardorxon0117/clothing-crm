@@ -1,0 +1,52 @@
+<% pageTitle = 'Mijozlar' %>
+<%- include('partials/head') %>
+
+<div class="page-actions">
+  <form action="/customers" method="GET" class="search-form">
+    <input type="text" name="search" value="<%= search %>" placeholder="Ism, telefon yoki email bo'yicha qidirish...">
+    <button type="submit" class="btn btn-light">Qidirish</button>
+    <% if (search) { %><a href="/customers" class="btn btn-ghost">Tozalash</a><% } %>
+  </form>
+  <a href="/customers/new" class="btn btn-primary">+ Yangi mijoz</a>
+</div>
+
+<div class="card">
+  <div class="card-body no-pad">
+    <% if (customers.length === 0) { %>
+      <div class="empty">
+        <% if (search) { %>
+          "<%= search %>" bo'yicha mijoz topilmadi.
+        <% } else { %>
+          Hozircha mijozlar yo'q. <a href="/customers/new">Birinchi mijozni qo'shing</a>.
+        <% } %>
+      </div>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Ism</th><th>Telefon</th><th>Email</th><th>Turi</th><th>Qo'shilgan</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% customers.forEach(c => { %>
+            <tr>
+              <td class="strong"><%= c.name %></td>
+              <td><%= c.phone || '—' %></td>
+              <td class="muted"><%= c.email || '—' %></td>
+              <td><span class="tag tag-<%= c.customer_type %>"><%= c.customer_type %></span></td>
+              <td class="muted"><%= new Date(c.created_at).toLocaleDateString('uz-UZ') %></td>
+              <td class="row-actions">
+                <a href="/customers/<%= c.id %>/edit" class="action-edit">Tahrirlash</a>
+                <form action="/customers/<%= c.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Bu mijozni o\u2019chirishni tasdiqlaysizmi?')">
+                  <button type="submit" class="action-delete">O'chirish</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

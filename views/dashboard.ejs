@@ -1,0 +1,201 @@
+<% pageTitle = 'Boshqaruv paneli' %>
+<%- include('partials/head') %>
+
+<!-- Welcome banner -->
+<div class="welcome">
+  <div class="welcome-content">
+    <h1>Xush kelibsiz, <%= adminName || 'Administrator' %> 👋</h1>
+    <p>Bugun <%= new Date().toLocaleDateString('uz-UZ', { weekday:'long', year:'numeric', month:'long', day:'numeric' }) %>. Mana do'koningizning bugungi holati.</p>
+    <div class="welcome-chips">
+      <span class="welcome-chip"><strong><%= stats.orders %></strong> buyurtma</span>
+      <span class="welcome-chip"><strong><%= stats.customers %></strong> mijoz</span>
+      <span class="welcome-chip"><strong><%= stats.products %></strong> mahsulot</span>
+      <% if (stats.lowStock > 0) { %><span class="welcome-chip">⚠️ <strong><%= stats.lowStock %></strong> kam qoldi</span><% } %>
+    </div>
+  </div>
+</div>
+
+<!-- KPI kartalar -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-top">
+      <div class="stat-icon green">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <span class="stat-trend up">Daromad</span>
+    </div>
+    <div class="stat-label">Jami daromad</div>
+    <div class="stat-value"><%= Number(stats.revenue).toLocaleString('uz-UZ') %> <span class="stat-unit">so'm</span></div>
+    <div class="stat-foot">Bekor qilinmagan buyurtmalar bo'yicha</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <div class="stat-icon blue">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      </div>
+      <span class="stat-trend flat">Jami</span>
+    </div>
+    <div class="stat-label">Buyurtmalar</div>
+    <div class="stat-value"><%= stats.orders %></div>
+    <div class="stat-foot">Barcha vaqt davomida</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <div class="stat-icon teal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <span class="stat-trend flat">Baza</span>
+    </div>
+    <div class="stat-label">Mijozlar</div>
+    <div class="stat-value"><%= stats.customers %></div>
+    <div class="stat-foot">Ro'yxatdagi mijozlar</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-top">
+      <div class="stat-icon amber">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      </div>
+      <span class="stat-trend <%= stats.lowStock > 0 ? 'flat' : 'up' %>">Ombor</span>
+    </div>
+    <div class="stat-label">Mahsulotlar</div>
+    <div class="stat-value"><%= stats.products %></div>
+    <div class="stat-foot <%= stats.lowStock > 0 ? 'warn' : '' %>"><%= stats.lowStock > 0 ? stats.lowStock + ' ta kam qoldi' : 'Ombor to\u2019liq' %></div>
+  </div>
+</div>
+
+<!-- Grafiklar -->
+<div class="grid-wide">
+  <div class="card">
+    <div class="card-head"><h2>Savdo dinamikasi</h2><span class="card-sub">Oxirgi 6 oy</span></div>
+    <div class="card-body">
+      <% if (salesByMonth.length === 0) { %>
+        <div class="empty">Hozircha savdo ma'lumotlari yo'q.</div>
+      <% } else { %>
+        <canvas id="salesChart" height="110"></canvas>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Buyurtma holatlari</h2></div>
+    <div class="card-body">
+      <% if (statusBreakdown.length === 0) { %>
+        <div class="empty">Ma'lumot yo'q.</div>
+      <% } else { %>
+        <canvas id="statusChart" height="180"></canvas>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Top mahsulotlar + kam qolganlar -->
+<div class="grid-2">
+  <div class="card">
+    <div class="card-head"><h2>Top mahsulotlar</h2><span class="card-sub">Sotuv bo'yicha</span></div>
+    <div class="card-body">
+      <% if (topProducts.length === 0 || topProducts.every(p => Number(p.sold) === 0)) { %>
+        <div class="empty">Hali sotuv bo'lmagan.</div>
+      <% } else {
+           const maxSold = Math.max(...topProducts.map(p => Number(p.sold)), 1); %>
+        <ul class="rank-list">
+          <% topProducts.forEach((p, idx) => { %>
+            <li class="rank-item">
+              <div class="rank-row">
+                <span class="rank-num"><%= idx + 1 %></span>
+                <span class="rank-name"><%= p.name %></span>
+                <span class="rank-value"><%= p.sold %> dona</span>
+              </div>
+              <div class="rank-bar"><span style="width: <%= Math.round(Number(p.sold)/maxSold*100) %>%"></span></div>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <h2>Kam qolgan mahsulotlar</h2>
+      <a href="/reports" class="card-link">Batafsil →</a>
+    </div>
+    <div class="card-body">
+      <% if (lowStockList.length === 0) { %>
+        <div class="empty">Hamma mahsulot yetarli. ✓</div>
+      <% } else { %>
+        <ul class="mini-list">
+          <% lowStockList.forEach(p => { %>
+            <li>
+              <span><span class="ml-name"><%= p.name %></span><span class="ml-meta"><%= [p.size, p.color].filter(Boolean).join(' · ') %></span></span>
+              <span class="badge badge-bekor"><%= p.stock %> dona</span>
+            </li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Oxirgi buyurtmalar -->
+<div class="card">
+  <div class="card-head"><h2>Oxirgi buyurtmalar</h2><a href="/orders" class="card-link">Hammasini ko'rish →</a></div>
+  <div class="card-body no-pad">
+    <% if (recentOrders.length === 0) { %>
+      <div class="empty">Hozircha buyurtmalar yo'q.</div>
+    <% } else { %>
+      <table class="table">
+        <thead><tr><th>№</th><th>Mijoz</th><th>Summa</th><th>Holat</th><th>Sana</th></tr></thead>
+        <tbody>
+          <% recentOrders.forEach(o => { %>
+            <tr>
+              <td class="strong">#<%= o.id %></td>
+              <td><%= o.customer_name %></td>
+              <td><%= Number(o.total).toLocaleString('uz-UZ') %> so'm</td>
+              <td><span class="badge badge-<%= o.status %>"><%= o.status %></span></td>
+              <td class="muted"><%= new Date(o.created_at).toLocaleDateString('uz-UZ') %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+<% if (salesByMonth.length > 0) { %>
+  new Chart(document.getElementById('salesChart'), {
+    type: 'line',
+    data: {
+      labels: <%- JSON.stringify(salesByMonth.map(r => r.month)) %>,
+      datasets: [{
+        label: 'Savdo', data: <%- JSON.stringify(salesByMonth.map(r => Number(r.total))) %>,
+        borderColor: '#1f883d', backgroundColor: 'rgba(31,136,61,0.10)',
+        borderWidth: 2.5, fill: true, tension: 0.35,
+        pointBackgroundColor: '#1f883d', pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: true, plugins: { legend: { display: false } },
+      scales: { y: { ticks: { callback: v => (v/1000)+'k' }, grid: { color: 'rgba(27,31,36,0.06)' } }, x: { grid: { display: false } } }
+    }
+  });
+<% } %>
+<% if (statusBreakdown.length > 0) { %>
+  const statusColors = { 'yangi':'#0969da', 'to\u2019langan':'#9a6700', 'yetkazilgan':'#1f883d', 'bekor':'#cf222e' };
+  const sLabels = <%- JSON.stringify(statusBreakdown.map(r => r.status)) %>;
+  new Chart(document.getElementById('statusChart'), {
+    type: 'doughnut',
+    data: {
+      labels: sLabels,
+      datasets: [{ data: <%- JSON.stringify(statusBreakdown.map(r => Number(r.count))) %>,
+        backgroundColor: sLabels.map(s => statusColors[s] || '#8c959f'), borderWidth: 0 }]
+    },
+    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, font: { size: 12 } } } }, cutout: '60%' }
+  });
+<% } %>
+</script>
+
+<%- include('partials/foot') %>

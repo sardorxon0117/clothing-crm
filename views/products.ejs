@@ -1,0 +1,58 @@
+<% pageTitle = 'Mahsulotlar' %>
+<%- include('partials/head') %>
+
+<div class="page-actions">
+  <form action="/products" method="GET" class="search-form">
+    <input type="text" name="search" value="<%= search %>" placeholder="Mahsulot nomi yoki rang...">
+    <select name="category" onchange="this.form.submit()">
+      <option value="">Barcha kategoriyalar</option>
+      <% categories.forEach(c => { %>
+        <option value="<%= c.id %>" <%= String(selectedCategory) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+      <% }) %>
+    </select>
+    <button type="submit" class="btn btn-light">Qidirish</button>
+    <% if (search || selectedCategory) { %><a href="/products" class="btn btn-ghost">Tozalash</a><% } %>
+  </form>
+  <a href="/products/new" class="btn btn-primary">+ Yangi mahsulot</a>
+</div>
+
+<% if (products.length === 0) { %>
+  <div class="card"><div class="empty">
+    Mahsulot topilmadi. <a href="/products/new">Yangi mahsulot qo'shing</a>.
+  </div></div>
+<% } else { %>
+  <div class="product-grid">
+    <% products.forEach(p => { %>
+      <div class="product-card">
+        <div class="product-img">
+          <% if (p.image_url) { %>
+            <img src="<%= p.image_url %>" alt="<%= p.name %>" onerror="this.parentElement.classList.add('no-img'); this.remove();">
+          <% } else { %>
+            <span class="img-placeholder">▤</span>
+          <% } %>
+          <% if (p.stock <= 10) { %><span class="stock-flag">Kam qoldi: <%= p.stock %></span><% } %>
+        </div>
+        <div class="product-info">
+          <div class="product-cat"><%= p.category_name || 'Kategoriyasiz' %></div>
+          <div class="product-name"><%= p.name %></div>
+          <div class="product-meta">
+            <% if (p.size) { %><span class="chip"><%= p.size %></span><% } %>
+            <% if (p.color) { %><span class="chip"><%= p.color %></span><% } %>
+          </div>
+          <div class="product-bottom">
+            <div class="product-price"><%= Number(p.price).toLocaleString('uz-UZ') %> so'm</div>
+            <div class="product-stock <%= p.stock <= 10 ? 'low' : '' %>"><%= p.stock %> dona</div>
+          </div>
+          <div class="product-actions">
+            <a href="/products/<%= p.id %>/edit" class="btn btn-light btn-sm">Tahrirlash</a>
+            <form action="/products/<%= p.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Mahsulotni o\u2019chirishni tasdiqlaysizmi?')">
+              <button type="submit" class="btn btn-danger-ghost btn-sm">O'chirish</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>
+
+<%- include('partials/foot') %>

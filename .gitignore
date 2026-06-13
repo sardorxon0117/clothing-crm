@@ -1,0 +1,17 @@
+# Maxfiy ma'lumotlar — HECH QACHON GitHub'ga yuklamang
+.env
+
+# Node modullari (Render o'zi o'rnatadi)
+node_modules/
+
+# Loglar
+npm-debug.log*
+*.log
+
+# OS fayllari
+.DS_Store
+Thumbs.db
+
+# Muharrir fayllari
+.vscode/
+.idea/

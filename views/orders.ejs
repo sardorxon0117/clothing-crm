@@ -1,0 +1,45 @@
+<% pageTitle = 'Buyurtmalar' %>
+<%- include('partials/head') %>
+
+<div class="page-actions">
+  <div class="filter-tabs">
+    <a href="/orders" class="filter-tab <%= !statusFilter ? 'active' : '' %>">Hammasi</a>
+    <% ['yangi','to\u2019langan','yetkazilgan','bekor'].forEach(s => { %>
+      <a href="/orders?status=<%= encodeURIComponent(s) %>" class="filter-tab <%= statusFilter === s ? 'active' : '' %>"><%= s %></a>
+    <% }) %>
+  </div>
+  <a href="/orders/new" class="btn btn-primary">+ Yangi buyurtma</a>
+</div>
+
+<div class="card">
+  <div class="card-body no-pad">
+    <% if (orders.length === 0) { %>
+      <div class="empty">Buyurtmalar yo'q. <a href="/orders/new">Yangi buyurtma yarating</a>.</div>
+    <% } else { %>
+      <table class="table">
+        <thead>
+          <tr><th>№</th><th>Mijoz</th><th>Summa</th><th>Holat</th><th>Sana</th><th></th></tr>
+        </thead>
+        <tbody>
+          <% orders.forEach(o => { %>
+            <tr>
+              <td class="strong">#<%= o.id %></td>
+              <td><%= o.customer_name %></td>
+              <td><%= Number(o.total).toLocaleString('uz-UZ') %> so'm</td>
+              <td><span class="badge badge-<%= o.status %>"><%= o.status %></span></td>
+              <td class="muted"><%= new Date(o.created_at).toLocaleDateString('uz-UZ') %></td>
+              <td class="row-actions">
+                <a href="/orders/<%= o.id %>" class="action-edit">Ko'rish</a>
+                <form action="/orders/<%= o.id %>?_method=DELETE" method="POST" onsubmit="return confirm('Buyurtmani o\u2019chirishni tasdiqlaysizmi?')">
+                  <button type="submit" class="action-delete">O'chirish</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

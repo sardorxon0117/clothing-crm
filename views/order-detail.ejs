@@ -1,0 +1,58 @@
+<% pageTitle = 'Buyurtma #' + order.id %>
+<%- include('partials/head') %>
+
+<div class="detail-grid">
+  <div class="card">
+    <div class="card-head">
+      <h2>Buyurtma #<%= order.id %></h2>
+      <span class="badge badge-<%= order.status %>"><%= order.status %></span>
+    </div>
+    <div class="card-body no-pad">
+      <table class="table">
+        <thead><tr><th>Mahsulot</th><th>Narx</th><th>Soni</th><th>Jami</th></tr></thead>
+        <tbody>
+          <% items.forEach(it => { %>
+            <tr>
+              <td class="strong"><%= it.product_name %></td>
+              <td><%= Number(it.price).toLocaleString('uz-UZ') %> so'm</td>
+              <td><%= it.quantity %></td>
+              <td><%= Number(it.price * it.quantity).toLocaleString('uz-UZ') %> so'm</td>
+            </tr>
+          <% }) %>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="3" class="tfoot-label">Umumiy summa</td><td class="tfoot-total"><%= Number(order.total).toLocaleString('uz-UZ') %> so'm</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="side-col">
+    <div class="card">
+      <div class="card-head"><h2>Mijoz</h2></div>
+      <div class="card-body">
+        <div class="info-line"><span>Ism</span><strong><%= order.customer_name %></strong></div>
+        <div class="info-line"><span>Telefon</span><strong><%= order.customer_phone || '—' %></strong></div>
+        <div class="info-line"><span>Sana</span><strong><%= new Date(order.created_at).toLocaleString('uz-UZ') %></strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Holatni o'zgartirish</h2></div>
+      <div class="card-body">
+        <form action="/orders/<%= order.id %>/status?_method=PUT" method="POST" class="form">
+          <select name="status">
+            <% ['yangi','to\u2019langan','yetkazilgan','bekor'].forEach(s => { %>
+              <option value="<%= s %>" <%= order.status === s ? 'selected' : '' %>><%= s %></option>
+            <% }) %>
+          </select>
+          <button type="submit" class="btn btn-primary btn-block">Yangilash</button>
+        </form>
+      </div>
+    </div>
+
+    <a href="/orders" class="btn btn-ghost btn-block">← Buyurtmalarga qaytish</a>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

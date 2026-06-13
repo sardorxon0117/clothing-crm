@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kirish — Stil Savdo CRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-page">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-mark login-mark">S</div>
+        <h1>Stil Savdo</h1>
+        <p>CRM boshqaruv tizimi</p>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert alert-error"><%= error %></div>
+      <% } %>
+
+      <form action="/login" method="POST" class="login-form">
+        <label>
+          <span>Foydalanuvchi nomi</span>
+          <input type="text" name="username" placeholder="admin" required autofocus>
+        </label>
+        <label>
+          <span>Parol</span>
+          <input type="password" name="password" placeholder="••••••••" required>
+        </label>
+        <button type="submit" class="btn btn-primary btn-block">Tizimga kirish</button>
+      </form>
+
+      <p class="login-foot">Faqat administratorlar uchun</p>
+    </div>
+    <p class="login-copyright">© <%= new Date().getFullYear() %> Stil Savdo — Bulutli CRM</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<% pageTitle = 'Sozlamalar' %>
+<%- include('partials/head') %>
+
+<div class="form-wrap">
+  <div class="card">
+    <div class="card-head"><h2>Parolni o'zgartirish</h2></div>
+    <div class="card-body">
+      <% if (message) { %><div class="alert alert-success"><%= message %></div><% } %>
+      <% if (error) { %><div class="alert alert-error"><%= error %></div><% } %>
+
+      <form action="/settings/password" method="POST" class="form">
+        <label class="field">
+          <span>Joriy parol</span>
+          <input type="password" name="current_password" required>
+        </label>
+        <label class="field">
+          <span>Yangi parol</span>
+          <input type="password" name="new_password" required minlength="6">
+          <small class="field-hint">Kamida 6 ta belgi.</small>
+        </label>
+        <label class="field">
+          <span>Yangi parolni tasdiqlang</span>
+          <input type="password" name="confirm_password" required>
+        </label>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Parolni yangilash</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

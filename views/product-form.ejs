@@ -1,0 +1,105 @@
+<% pageTitle = formTitle %>
+<%- include('partials/head') %>
+
+<div class="form-wrap">
+  <div class="card">
+    <div class="card-head"><h2><%= formTitle %></h2></div>
+    <div class="card-body">
+      <% const action = product ? '/products/' + product.id + '?_method=PUT' : '/products' %>
+      <form action="<%= action %>" method="POST" class="form" enctype="multipart/form-data">
+
+        <label class="field">
+          <span>Mahsulot nomi <em>*</em></span>
+          <input type="text" name="name" value="<%= product ? product.name : '' %>" required placeholder="Masalan: Klassik oq ko'ylak">
+        </label>
+
+        <div class="form-row form-row-3">
+          <label class="field">
+            <span>Kategoriya</span>
+            <select name="category_id">
+              <option value="">— tanlang —</option>
+              <% categories.forEach(c => { %>
+                <option value="<%= c.id %>" <%= product && String(product.category_id) === String(c.id) ? 'selected' : '' %>><%= c.name %></option>
+              <% }) %>
+            </select>
+          </label>
+          <label class="field">
+            <span>O'lcham</span>
+            <input type="text" name="size" value="<%= product ? (product.size || '') : '' %>" placeholder="S / M / L / XL">
+          </label>
+          <label class="field">
+            <span>Rang</span>
+            <input type="text" name="color" value="<%= product ? (product.color || '') : '' %>" placeholder="Oq, qora...">
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label class="field">
+            <span>Narx (so'm) <em>*</em></span>
+            <input type="number" name="price" value="<%= product ? product.price : '' %>" min="0" step="1000" required placeholder="250000">
+          </label>
+          <label class="field">
+            <span>Ombordagi qoldiq <em>*</em></span>
+            <input type="number" name="stock" value="<%= product ? product.stock : '' %>" min="0" required placeholder="50">
+          </label>
+        </div>
+
+        <!-- Rasm yuklash -->
+        <div class="field">
+          <span>Mahsulot rasmi</span>
+          <% if (s3Configured) { %>
+            <label class="upload-zone" id="uploadZone">
+              <div class="upload-preview" id="preview">
+                <% if (product && product.image_url) { %>
+                  <img src="<%= product.image_url %>" alt="rasm">
+                <% } else { %>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <% } %>
+              </div>
+              <div class="upload-text">
+                <strong id="uploadLabel"><%= product && product.image_url ? 'Rasmni almashtirish' : 'Rasm tanlash' %></strong>
+                <span>PNG, JPG yoki WEBP · 5 MB gacha · kompyuteringizdan tanlang</span>
+              </div>
+              <input type="file" name="image" id="fileInput" accept="image/*">
+            </label>
+            <% if (product && product.image_url) { %>
+              <small class="field-hint">Yangi rasm tanlamasangiz, joriy rasm o'zgarmaydi.</small>
+            <% } %>
+          <% } else { %>
+            <div class="alert alert-warn">
+              AWS S3 hali sozlanmagan. Rasm yuklash uchun <code>.env</code> fayliga AWS kalitlarini qo'shing va serverni qayta ishga tushiring.
+            </div>
+          <% } %>
+        </div>
+
+        <div class="form-actions">
+          <a href="/products" class="btn btn-ghost">Bekor qilish</a>
+          <button type="submit" class="btn btn-primary"><%= product ? 'Saqlash' : 'Qo\u2019shish' %></button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<% if (s3Configured) { %>
+<script>
+  // Tanlangan rasmni darrov ko'rsatish (oldindan ko'rish)
+  const fileInput = document.getElementById('fileInput');
+  const preview = document.getElementById('preview');
+  const label = document.getElementById('uploadLabel');
+  if (fileInput) {
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        preview.innerHTML = '<img src="' + ev.target.result + '" alt="rasm">';
+        label.textContent = file.name.length > 28 ? file.name.slice(0, 28) + '…' : file.name;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+<% } %>
+
+<%- include('partials/foot') %>

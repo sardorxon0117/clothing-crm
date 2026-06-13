@@ -1,0 +1,107 @@
+<% pageTitle = 'Yangi buyurtma' %>
+<%- include('partials/head') %>
+
+<div class="form-wrap form-wrap-wide">
+  <div class="card">
+    <div class="card-head"><h2>Yangi buyurtma yaratish</h2></div>
+    <div class="card-body">
+      <% if (customers.length === 0) { %>
+        <div class="alert alert-warn">Avval kamida bitta <a href="/customers/new">mijoz</a> qo'shing.</div>
+      <% } else if (products.length === 0) { %>
+        <div class="alert alert-warn">Omborida mahsulot yo'q. Avval <a href="/products/new">mahsulot</a> qo'shing.</div>
+      <% } else { %>
+      <form action="/orders" method="POST" class="form" id="orderForm">
+        <label class="field">
+          <span>Mijoz <em>*</em></span>
+          <select name="customer_id" required>
+            <option value="">— mijozni tanlang —</option>
+            <% customers.forEach(c => { %>
+              <option value="<%= c.id %>"><%= c.name %></option>
+            <% }) %>
+          </select>
+        </label>
+
+        <div class="items-head">
+          <h3>Mahsulotlar</h3>
+          <button type="button" class="btn btn-light btn-sm" id="addRow">+ Qator qo'shish</button>
+        </div>
+
+        <div id="itemsContainer">
+          <!-- Qatorlar JS orqali qo'shiladi -->
+        </div>
+
+        <div class="order-total">
+          <span>Umumiy summa:</span>
+          <strong id="totalDisplay">0 so'm</strong>
+        </div>
+
+        <div class="form-actions">
+          <a href="/orders" class="btn btn-ghost">Bekor qilish</a>
+          <button type="submit" class="btn btn-primary">Buyurtmani saqlash</button>
+        </div>
+      </form>
+
+      <script>
+        // Mahsulotlar ma'lumoti (narx, qoldiq)
+        const PRODUCTS = <%- JSON.stringify(products.map(p => ({ id: p.id, name: p.name, price: Number(p.price), stock: p.stock }))) %>;
+
+        const container = document.getElementById('itemsContainer');
+
+        function optionsHtml() {
+          return '<option value="">— mahsulot —</option>' +
+            PRODUCTS.map(p => `<option value="${p.id}" data-price="${p.price}" data-stock="${p.stock}">${p.name} (${p.price.toLocaleString('uz-UZ')} so'm · ${p.stock} dona)</option>`).join('');
+        }
+
+        function addRow() {
+          const row = document.createElement('div');
+          row.className = 'item-row';
+          row.innerHTML = `
+            <select name="product_id" class="item-product" required>${optionsHtml()}</select>
+            <input type="number" name="quantity" class="item-qty" min="1" value="1" required>
+            <span class="item-sub">0 so'm</span>
+            <button type="button" class="item-remove" title="O'chirish">✕</button>
+          `;
+          container.appendChild(row);
+          attachRow(row);
+        }
+
+        function attachRow(row) {
+          const sel = row.querySelector('.item-product');
+          const qty = row.querySelector('.item-qty');
+          const sub = row.querySelector('.item-sub');
+          const rm = row.querySelector('.item-remove');
+
+          function update() {
+            const opt = sel.options[sel.selectedIndex];
+            const price = opt ? Number(opt.dataset.price || 0) : 0;
+            const stock = opt ? Number(opt.dataset.stock || 0) : 0;
+            let q = parseInt(qty.value) || 0;
+            if (stock && q > stock) { q = stock; qty.value = stock; }
+            sub.textContent = (price * q).toLocaleString('uz-UZ') + " so'm";
+            recalcTotal();
+          }
+          sel.addEventListener('change', update);
+          qty.addEventListener('input', update);
+          rm.addEventListener('click', () => { row.remove(); recalcTotal(); });
+        }
+
+        function recalcTotal() {
+          let total = 0;
+          document.querySelectorAll('.item-row').forEach(row => {
+            const opt = row.querySelector('.item-product').selectedOptions[0];
+            const price = opt ? Number(opt.dataset.price || 0) : 0;
+            const q = parseInt(row.querySelector('.item-qty').value) || 0;
+            total += price * q;
+          });
+          document.getElementById('totalDisplay').textContent = total.toLocaleString('uz-UZ') + " so'm";
+        }
+
+        document.getElementById('addRow').addEventListener('click', addRow);
+        addRow(); // boshlang'ich bitta qator
+      </script>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>
