@@ -33,7 +33,7 @@
           <% if (p.stock <= 10) { %><span class="stock-flag">Kam qoldi: <%= p.stock %></span><% } %>
         </div>
         <div class="product-info">
-          <div class="product-cat"><%= p.category_name || 'Kategoriyasiz' %></div>
+          <div class="product-cat">#<%= p.id || 'Kategoriyasiz' %> <%= p.category_name || 'Kategoriyasiz' %></div>
           <div class="product-name"><%= p.name %></div>
           <div class="product-meta">
             <% if (p.size) { %><span class="chip"><%= p.size %></span><% } %>
