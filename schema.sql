@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- ============================================
 
 INSERT INTO categories (name) VALUES
-('Ko''ylak'), ('Shim'), ('Kurtka'), ('Futbolka'), ('Ayollar ko''ylagi')
+('Erkaklar'), ('Bolalar kiyimlari'), ('Yozgi kiyimlar'), ('Oyoq kiyimlar'), ('Sport kiyimlari')
 ON CONFLICT (name) DO NOTHING;
 
 INSERT INTO products (name, category_id, size, color, price, stock) VALUES
