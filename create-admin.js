@@ -13,9 +13,9 @@ const bcrypt = require('bcryptjs');
 const db = require('./db');
 
 // ⬇️ SHU YERNI O'ZGARTIRING
-const USERNAME = 'admin';
-const PASSWORD = 'admin123';       // login uchun parol — keyin o'zgartira olasiz
-const FULL_NAME = 'Bosh administrator';
+const USERNAME = 'sardorxon';
+const PASSWORD = 'sardorxon123';       // login uchun parol — keyin o'zgartira olasiz
+const FULL_NAME = 'Sardorxon Admin';
 // ⬆️
 
 async function createAdmin() {
